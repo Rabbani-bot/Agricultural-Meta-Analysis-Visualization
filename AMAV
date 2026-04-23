@@ -1,0 +1,81 @@
+# Import necessary libraries for data manipulation and visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+from collections import Counter
+
+
+# Data for Fig 1: Overall Paper Breakdown
+paper_categories = ['Meta-Analyses', 'Non-Meta-Analyses']
+paper_counts = [45, 19]
+
+# Data for Fig 2: Publication Years of the 16 Strict Field Studies
+# Extracted from the provided sources (2013 to 2026)
+publication_years = [
+    2026, 2025, 2024, 2024, 2023, 2023, 2023, 2023, 
+    2022, 2022, 2020, 2019, 2018, 2018, 2013, 2013
+]
+
+# Count the frequency of each year
+year_counts = Counter(publication_years)
+years_df = pd.DataFrame(list(year_counts.items()), columns=['Year', 'Count'])
+years_df = years_df.sort_values(by='Year')
+
+
+# Set the visual style for a clean, professional look
+sns.set_theme(style="whitegrid")
+fig, axes = plt.subplots(1, 2, figsize=(16, 10))
+fig.suptitle('Agricultural Field Meta-Analyses on Water and Carbon Dynamics', 
+             fontsize=18, fontweight='bold', y=1.05)
+
+# Subplot 1: Donut Chart for Paper Types 
+colors = ['#2b7bba', '#d3e4f4']
+
+# Create pie chart
+axes[0].pie(paper_counts, labels=paper_categories, autopct='%1.1f%%', 
+            startangle=140, colors=colors, 
+            textprops={'fontsize': 12, 'weight': 'bold'},
+            wedgeprops={'edgecolor': 'white', 'linewidth': 2})
+
+# Draw a circle in the center to turn it into a donut chart
+centre_circle = plt.Circle((0, 0), 0.70, fc='white')
+axes[0].add_artist(centre_circle)
+
+# Add text to the center
+axes[0].text(0, 0, '64\nTotal Papers', ha='center', va='center', 
+             fontsize=14, fontweight='bold', color='#333333')
+axes[0].set_title('Composition of Reviewed Literature', fontsize=14, pad=20)
+
+# --- Subplot 2: Bar Chart for Timeline ---
+# Create bar plot
+sns.barplot(x='Year', y='Count', data=years_df, ax=axes[1], color='#2b7bba')
+
+# Customize labels and titles
+axes[1].set_title('Publication Timeline: 16 Strict Field Meta-Analyses', fontsize=14, pad=20)
+axes[1].set_xlabel('Publication Year', fontsize=12, labelpad=10)
+axes[1].set_ylabel('Number of Studies', fontsize=12, labelpad=10)
+
+# Ensure y-axis only shows whole numbers (since we can't have half a paper)
+axes[1].set_yticks(range(0, max(years_df['Count']) + 2))
+
+# Add value labels on top of the bars for extreme clarity
+for p in axes[1].patches:
+    axes[1].annotate(format(int(p.get_height()), 'd'), 
+                     (p.get_x() + p.get_width() / 2., p.get_height()), 
+                     ha = 'center', va = 'center', 
+                     xytext = (0, 8), 
+                     textcoords = 'offset points',
+                     fontweight='bold', color='#333333')
+
+# Remove the top and right borders on the bar chart for a cleaner look
+sns.despine(ax=axes[1])
+
+# Adjust spacing between subplots
+plt.tight_layout()
+
+
+# Save the figure as a high-quality PNG file suitable for LinkedIn
+plt.savefig('agricultural_meta_analysis_visuals.png', dpi=300, bbox_inches='tight')
+
+# Display the plot in the notebook
+plt.show()
